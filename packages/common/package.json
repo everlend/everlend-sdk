@@ -1,0 +1,35 @@
+{
+  "name": "@everlend/common",
+  "version": "0.0.3",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "repository": {
+    "url": "git@github.com:everlend/everlend.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "rimraf dist && tsc -p ./tsconfig.build.json",
+    "clean": "yarn cache clean && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "@types/node": "^16.11.1",
+    "rimraf": "^3.0.2",
+    "ts-node": "^10.3.0",
+    "typescript": "^4.4.4"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "dependencies": {
+    "@solana/spl-token": "^0.1.5",
+    "@solana/web3.js": "^1.16.1",
+    "borsh": "^0.6.0",
+    "bs58": "^4.0.1",
+    "buffer": "^6.0.3"
+  }
+}

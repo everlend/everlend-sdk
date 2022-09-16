@@ -1,0 +1,29 @@
+{
+  "name": "everlend-sdk",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build": "yarn workspaces foreach -pt --no-private run build && npx typedoc",
+    "fix:prettier": "prettier --write \"**/*.ts\"",
+    "fix:eslint": "eslint . --format stylish --fix",
+    "fix": "yarn fix:eslint && yarn fix:prettier",
+    "publish": "yarn workspaces foreach -pt --no-private npm publish"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "@types/node": "^16.11.1",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/parser": "^5.0.0",
+    "eslint": "^8.0.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "prettier": "^2.4.1",
+    "rimraf": "^3.0.2",
+    "typedoc": "^0.22.17",
+    "typescript": "^4.4.3"
+  },
+  "author": "",
+  "license": "ISC"
+}
