@@ -1,29 +1,37 @@
 {
   "name": "everlend-sdk",
   "version": "0.0.1",
-  "private": true,
+  "license": "MIT",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
-    "build": "yarn workspaces foreach -pt --no-private run build && npx typedoc",
-    "fix:prettier": "prettier --write \"**/*.ts\"",
-    "fix:eslint": "eslint . --format stylish --fix",
-    "fix": "yarn fix:eslint && yarn fix:prettier",
-    "publish": "yarn workspaces foreach -pt --no-private npm publish"
+    "build": "rimraf dist && tsc -p tsconfig.json && npx typedoc",
+    "clean": "yarn cache clean && rm -rf node_modules",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
-  "workspaces": [
-    "packages/*"
-  ],
   "devDependencies": {
+    "@types/jest": "^27.0.2",
     "@types/node": "^16.11.1",
-    "@typescript-eslint/eslint-plugin": "^5.0.0",
-    "@typescript-eslint/parser": "^5.0.0",
-    "eslint": "^8.0.1",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-prettier": "^4.0.0",
-    "prettier": "^2.4.1",
+    "jest": "^27.3.0",
     "rimraf": "^3.0.2",
-    "typedoc": "^0.22.17",
-    "typescript": "^4.4.3"
+    "ts-jest": "^27.0.7",
+    "ts-node": "^10.3.0",
+    "typescript": "^4.4.4"
   },
-  "author": "",
-  "license": "ISC"
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "dependencies": {
+    "@solana/spl-token": "^0.1.5",
+    "@solana/web3.js": "^1.16.1",
+    "borsh": "^0.6.0",
+    "bs58": "^4.0.1",
+    "buffer": "^6.0.3"
+  }
 }
