@@ -1,4 +1,4 @@
-import { ActionOptions, ActionResult } from './types'
+import { AccountLayout, NATIVE_MINT, Token, TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import {
   Keypair,
   PublicKey,
@@ -6,13 +6,13 @@ import {
   Transaction,
   TransactionInstruction,
 } from '@solana/web3.js'
-import { Pool } from '../accounts'
-import { GeneralPoolsProgram } from '../program'
-import { Buffer } from 'buffer'
-import { AccountLayout, NATIVE_MINT, Token, TOKEN_PROGRAM_ID } from '@solana/spl-token'
-import { CreateAssociatedTokenAccount, findAssociatedTokenAccount } from '../common'
-import { DepositTx } from '../transactions'
 import BN from 'bn.js'
+import { Pool } from '../accounts'
+import { CreateAssociatedTokenAccount, findAssociatedTokenAccount } from '../common'
+import { GeneralPoolsProgram } from '../program'
+import { DepositTx } from '../transactions'
+import { ActionOptions, ActionResult, getRewardPoolAndAccount } from '../utils'
+import { prepareInititalizeMining } from './prepareInitializeMiningTx'
 
 /**
  * Creates a transaction object for depositing to a general pool.
@@ -22,10 +22,6 @@ import BN from 'bn.js'
  * @param actionOptions
  * @param pool the general pool public key for a specific token, e.g. there can be a general pool for USDT or USDC etc.
  * @param amount the amount of tokens in lamports to deposit.
- * @param rewardProgramId reward program id
- * @param config const
- * @param rewardPool public key of reward pool
- * @param rewardAccount public key of user reward account
  * @param source the public key which represents user's token ATA (token mint ATA) from which the token amount will be taken.
  * When depositing native SOL it will be replaced by a newly generated ATA for wrapped SOL, created by `payerPublicKey` from [[ActionOptions]].
  * @param destination the public key which represents user's collateral token ATA (pool mint ATA) where collateral tokens
@@ -33,24 +29,37 @@ import BN from 'bn.js'
  *
  * @returns the object with a prepared deposit transaction and generated keypair if depositing SOL.
  */
+
 export const prepareDepositTx = async (
-  { connection, payerPublicKey }: ActionOptions,
+  { connection, payerPublicKey, user, network }: ActionOptions,
   pool: PublicKey,
   amount: BN,
-  rewardProgramId: PublicKey,
-  config: PublicKey,
-  rewardPool: PublicKey,
-  rewardAccount: PublicKey,
   source: PublicKey,
   destination?: PublicKey,
 ): Promise<ActionResult> => {
   const {
     data: { poolMarket, tokenAccount, poolMint, tokenMint },
   } = await Pool.load(connection, pool)
-
   const poolMarketAuthority = await GeneralPoolsProgram.findProgramAddress([poolMarket.toBuffer()])
-
+  const { rewardPool, rewardAccount } = await getRewardPoolAndAccount(
+    pool,
+    connection,
+    user,
+    network,
+  )
+  const accountInfo = await connection.getAccountInfo(rewardAccount)
+  const poolInfo = await connection.getAccountInfo(rewardPool)
   const tx = new Transaction()
+
+  if (!accountInfo && poolInfo?.data) {
+    const { tx: initMiningTx } = await prepareInititalizeMining(
+      { payerPublicKey, connection, user },
+      rewardPool,
+      rewardAccount,
+    )
+    tx.add(initMiningTx)
+  }
+
   const poolConfig = await GeneralPoolsProgram.findProgramAddress([
     Buffer.from('config'),
     pool.toBuffer(),
@@ -116,8 +125,6 @@ export const prepareDepositTx = async (
         poolMint,
         rewardPool,
         rewardAccount,
-        config,
-        rewardProgramId,
         poolMarketAuthority,
         amount,
       },

@@ -31,7 +31,7 @@ export class InitPoolMarketTx extends Transaction {
       new TransactionInstruction({
         keys: [
           { pubkey: poolMarket, isSigner: false, isWritable: true },
-          { pubkey: manager || feePayer, isSigner: false, isWritable: false },
+          { pubkey: manager || feePayer, isSigner: false, isWritable: true },
           { pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },
         ],
         programId: GeneralPoolsProgram.PUBKEY,

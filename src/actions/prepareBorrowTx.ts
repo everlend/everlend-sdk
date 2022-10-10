@@ -1,4 +1,4 @@
-import { ActionOptions, ActionResult } from './types'
+import { ActionOptions, ActionResult } from '../utils'
 import { PublicKey, Transaction } from '@solana/web3.js'
 import { Pool, PoolBorrowAuthority } from '../accounts'
 import { GeneralPoolsProgram } from '../program'
@@ -8,6 +8,13 @@ import BN from 'bn.js'
 
 /**
  * Creates a transaction object for borrowing from a general pool.
+ *
+ * @param actionOptions
+ * @param pool
+ * @param amount
+ * @param destination
+ *
+ * @returns the object with a prepared tx.
  */
 export const prepareBorrowTx = async (
   { connection, payerPublicKey }: ActionOptions,

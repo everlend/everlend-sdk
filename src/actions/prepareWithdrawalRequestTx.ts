@@ -1,4 +1,4 @@
-import { ActionOptions, ActionResult } from './types'
+import { ActionOptions, ActionResult } from '../utils'
 import { PublicKey, Transaction } from '@solana/web3.js'
 import { Pool, UserWithdrawalRequest, WithdrawalRequestsState } from '../accounts'
 import { GeneralPoolsProgram } from '../program'
@@ -6,6 +6,7 @@ import { Buffer } from 'buffer'
 import { CreateAssociatedTokenAccount, findAssociatedTokenAccount } from '../common'
 import { WithdrawalRequestTx } from '../transactions'
 import BN from 'bn.js'
+import { getRewardPoolAndAccount } from '../utils'
 
 /**
  * Creates a transaction object for a withdrawal request from a general pool.
@@ -19,10 +20,6 @@ import BN from 'bn.js'
  * @param actionOptions
  * @param pool the general pool public key for a specific token, e.g. there can be a general pool for USDT or USDC etc.
  * @param collateralAmount the amount of collateral tokens in lamports which will be taken from a user.
- * @param rewardProgramId reward program id
- * @param config const
- * @param rewardPool public key of reward pool
- * @param rewardAccount public key of user reward account
  * @param source the public key which represents user's collateral token ATA (pool mint ATA) from which the collateral tokens will be taken.
  * @param destination the public key which represents user's token ATA (token mint ATA) to which the withdrawn from
  * a general pool tokens will be sent. The param isn't used when withdrawing SOL. There is wrapped SOL unwrapping logic
@@ -31,19 +28,21 @@ import BN from 'bn.js'
  * @returns the object with a prepared withdrawal request transaction.
  */
 export const prepareWithdrawalRequestTx = async (
-  { connection, payerPublicKey }: ActionOptions,
+  { connection, payerPublicKey, user, network }: ActionOptions,
   pool: PublicKey,
   collateralAmount: BN,
-  rewardProgramId: PublicKey,
-  config: PublicKey,
-  rewardPool: PublicKey,
-  rewardAccount: PublicKey,
   source: PublicKey,
   destination?: PublicKey,
 ): Promise<ActionResult> => {
   const {
     data: { tokenMint, poolMarket, tokenAccount, poolMint },
   } = await Pool.load(connection, pool)
+  const { rewardPool, rewardAccount } = await getRewardPoolAndAccount(
+    pool,
+    connection,
+    user,
+    network,
+  )
 
   const withdrawRequests = await WithdrawalRequestsState.getPDA(poolMarket, tokenMint)
   const withdrawalRequest = await UserWithdrawalRequest.getPDA(withdrawRequests, payerPublicKey)
@@ -91,8 +90,6 @@ export const prepareWithdrawalRequestTx = async (
         collateralAmount,
         rewardPool,
         rewardAccount,
-        rewardProgramId,
-        config,
       },
     ),
   )

@@ -1,4 +1,4 @@
-import { ActionOptions, ActionResult } from './types'
+import { ActionOptions, ActionResult } from '../utils'
 import { PublicKey, Transaction } from '@solana/web3.js'
 import { Pool, UserWithdrawalRequest, WithdrawalRequestsState } from '../accounts'
 import { GeneralPoolsProgram } from '../program'

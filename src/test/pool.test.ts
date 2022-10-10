@@ -108,10 +108,6 @@ describe('Pool', () => {
         { connection, payerPublicKey },
         POOL_PUBKEY,
         amount,
-        REWARD_PROGRAM_ID,
-        CONFIG,
-        rewardPool,
-        rewardAccount,
         source,
         destination,
       )
@@ -137,10 +133,6 @@ describe('Pool', () => {
         { connection, payerPublicKey },
         POOL_PUBKEY,
         amount,
-        REWARD_PROGRAM_ID,
-        CONFIG,
-        rewardPool,
-        rewardAccount,
         destination,
         source,
       )

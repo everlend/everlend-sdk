@@ -11,6 +11,7 @@ import {
 import BN from 'bn.js'
 import { Borsh } from '../common'
 import { GeneralPoolsProgram } from '../program'
+import { RewardProgram } from '../rewardProgram'
 
 export class WithdrawalRequestTxData extends Borsh.Data<{ collateralAmount: BN }> {
   static readonly SCHEMA = this.struct([
@@ -35,8 +36,6 @@ type WithdrawalRequestTxParams = {
   collateralAmount: BN
   rewardPool: PublicKey
   rewardAccount: PublicKey
-  config: PublicKey
-  rewardProgramId: PublicKey
 }
 
 export class WithdrawalRequestTx extends Transaction {
@@ -57,8 +56,6 @@ export class WithdrawalRequestTx extends Transaction {
       collateralAmount,
       rewardPool,
       rewardAccount,
-      rewardProgramId,
-      config,
     } = params
 
     const data = WithdrawalRequestTxData.serialize({ collateralAmount })
@@ -79,8 +76,7 @@ export class WithdrawalRequestTx extends Transaction {
           { pubkey: feePayer, isSigner: true, isWritable: true },
           { pubkey: rewardPool, isSigner: false, isWritable: true },
           { pubkey: rewardAccount, isSigner: false, isWritable: true },
-          { pubkey: config, isSigner: false, isWritable: false },
-          { pubkey: rewardProgramId, isSigner: false, isWritable: false },
+          { pubkey: RewardProgram.PUBKEY, isSigner: false, isWritable: false },
           { pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },
           { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
           {

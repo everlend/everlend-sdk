@@ -28,6 +28,10 @@ export class Data<T = {}> {
     return struct(this, fields)
   }
 
+  static map<T, A>(this: DataConstructor<T, A>, types: any, fields: any) {
+    return map(types, fields)
+  }
+
   static serialize<T, A>(this: DataConstructor<T, A>, args: A = {} as A) {
     return Buffer.from(serialize(this.SCHEMA, new this(args)))
   }
@@ -35,6 +39,14 @@ export class Data<T = {}> {
   static deserialize<T, A>(this: DataConstructor<T, A>, data: Buffer) {
     return deserializeUnchecked(this.SCHEMA, this, data)
   }
+}
+
+export const map = <T>(type: any, fields: any) => {
+  const entries = type.map((v, i) => {
+    return [v, { kind: 'struct', fields: fields[i] }]
+  })
+
+  return new Map<any, any>(entries)
 }
 
 export const struct = <T>(type: any, fields: any) => {

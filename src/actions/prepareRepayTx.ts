@@ -1,8 +1,18 @@
-import { ActionOptions, ActionResult } from './types'
+import { ActionOptions, ActionResult } from '../utils'
 import { PublicKey } from '@solana/web3.js'
 import { Pool, PoolBorrowAuthority } from '../accounts'
 import { RepayTx } from '../transactions'
 import BN from 'bn.js'
+
+/**
+ * Creates a transaction object for repay.
+ *
+ * @param actionOptions
+ * @param pool
+ * @param amount
+ * @param interestAmount
+ * @param source
+ */
 
 export const prepareRepayTx = async (
   { connection, payerPublicKey }: ActionOptions,

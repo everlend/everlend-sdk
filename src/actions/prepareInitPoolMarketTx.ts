@@ -2,7 +2,14 @@ import { Keypair, SystemProgram, Transaction } from '@solana/web3.js'
 import { PoolMarket } from '../accounts'
 import { GeneralPoolsProgram } from '../program'
 import { InitPoolMarketTx } from '../transactions'
-import { ActionOptions, ActionResult } from './types'
+import { ActionOptions, ActionResult } from '../utils'
+
+/**
+ * Creates a transaction object for init pool market.
+ *
+ * @param actionOptions
+ * @param poolMarket
+ */
 
 export const prepareInitPoolMarketTx = async (
   { connection, payerPublicKey }: ActionOptions,

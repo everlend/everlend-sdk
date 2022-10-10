@@ -1,9 +1,21 @@
-import { ActionOptions, ActionResult } from './types'
+import { ActionOptions, ActionResult } from '../utils'
 import { Keypair, PublicKey, SystemProgram, Transaction } from '@solana/web3.js'
 import { AccountLayout, MintLayout, TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import { Pool } from '../accounts'
 import { GeneralPoolsProgram } from '../program'
 import { CreatePoolTx } from '../transactions'
+
+/**
+ * Creates a transaction object for create pool action.
+ *
+ * @param actionOptions
+ * @param poolMarket
+ * @param tokenMint
+ * @param tokenAccount
+ * @param poolMint
+ *
+ * @returns the object with a prepared create pool tx.
+ */
 
 export const prepareCreatePoolTx = async (
   { connection, payerPublicKey }: ActionOptions,
