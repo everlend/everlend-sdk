@@ -21,7 +21,7 @@ type TransferDepositTxParams = {
   destination: PublicKey
   destinationUserAuthority: PublicKey
   rewardPool: PublicKey
-  rewardAccount: PublicKey
+  miningAccount: PublicKey
   destinationRewardAccount: PublicKey
 }
 
@@ -35,7 +35,7 @@ export class TransferDepositTx extends Transaction {
       destination,
       destinationUserAuthority,
       rewardPool,
-      rewardAccount,
+      miningAccount,
       destinationRewardAccount,
     } = params
 
@@ -50,7 +50,7 @@ export class TransferDepositTx extends Transaction {
           { pubkey: feePayer, isSigner: true, isWritable: false },
           { pubkey: destinationUserAuthority, isSigner: false, isWritable: false },
           { pubkey: rewardPool, isSigner: false, isWritable: true },
-          { pubkey: rewardAccount, isSigner: false, isWritable: true },
+          { pubkey: miningAccount, isSigner: false, isWritable: true },
           { pubkey: destinationRewardAccount, isSigner: false, isWritable: true },
           { pubkey: RewardProgram.PUBKEY, isSigner: false, isWritable: false },
           { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },

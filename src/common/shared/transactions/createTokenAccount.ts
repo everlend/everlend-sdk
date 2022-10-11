@@ -1,7 +1,7 @@
 import { AccountLayout, Token, TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import { PublicKey, SystemProgram, Transaction, TransactionCtorFields } from '@solana/web3.js'
 
-type CreateTokenAccountParams = {
+interface CreateTokenAccountParams {
   newAccountPubkey: PublicKey
   lamports: number
   mint: PublicKey

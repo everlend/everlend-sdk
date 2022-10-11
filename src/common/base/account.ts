@@ -1,7 +1,7 @@
 import { AccountInfo, Connection, PublicKey } from '@solana/web3.js'
 import { Buffer } from 'buffer'
 
-export type AccountConstructor<T> = {
+export interface AccountConstructor<T> {
   new (publicKey: PublicKey, info: AccountInfo<Buffer>): T
 }
 

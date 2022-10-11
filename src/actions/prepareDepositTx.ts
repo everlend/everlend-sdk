@@ -11,7 +11,7 @@ import { Pool } from '../accounts'
 import { CreateAssociatedTokenAccount, findAssociatedTokenAccount } from '../common'
 import { GeneralPoolsProgram } from '../program'
 import { DepositTx } from '../transactions'
-import { ActionOptions, ActionResult, getRewardPoolAndAccount } from '../utils'
+import { ActionOptions, ActionResult, getRewardPoolAndMiningAccount } from '../utils'
 import { prepareInititalizeMining } from './prepareInitializeMiningTx'
 
 /**
@@ -21,6 +21,7 @@ import { prepareInititalizeMining } from './prepareInitializeMiningTx'
  *
  * @param actionOptions
  * @param pool the general pool public key for a specific token, e.g. there can be a general pool for USDT or USDC etc.
+ * @param authority
  * @param amount the amount of tokens in lamports to deposit.
  * @param source the public key which represents user's token ATA (token mint ATA) from which the token amount will be taken.
  * When depositing native SOL it will be replaced by a newly generated ATA for wrapped SOL, created by `payerPublicKey` from [[ActionOptions]].
@@ -31,8 +32,9 @@ import { prepareInititalizeMining } from './prepareInitializeMiningTx'
  */
 
 export const prepareDepositTx = async (
-  { connection, payerPublicKey, user, network }: ActionOptions,
+  { connection, feePayer, network }: ActionOptions,
   pool: PublicKey,
+  authority: PublicKey,
   amount: BN,
   source: PublicKey,
   destination?: PublicKey,
@@ -41,21 +43,23 @@ export const prepareDepositTx = async (
     data: { poolMarket, tokenAccount, poolMint, tokenMint },
   } = await Pool.load(connection, pool)
   const poolMarketAuthority = await GeneralPoolsProgram.findProgramAddress([poolMarket.toBuffer()])
-  const { rewardPool, rewardAccount } = await getRewardPoolAndAccount(
+  const { rewardPool, miningAccount } = await getRewardPoolAndMiningAccount({
     pool,
     connection,
-    user,
+    authority,
     network,
-  )
-  const accountInfo = await connection.getAccountInfo(rewardAccount)
-  const poolInfo = await connection.getAccountInfo(rewardPool)
+    tokenMint,
+  })
+  const miningAccountInfo = await connection.getAccountInfo(miningAccount)
+  const rewardPoolInfo = await connection.getAccountInfo(rewardPool)
   const tx = new Transaction()
 
-  if (!accountInfo && poolInfo?.data) {
+  if (!miningAccountInfo && rewardPoolInfo) {
     const { tx: initMiningTx } = await prepareInititalizeMining(
-      { payerPublicKey, connection, user },
+      { feePayer, connection },
+      authority,
       rewardPool,
-      rewardAccount,
+      miningAccount,
     )
     tx.add(initMiningTx)
   }
@@ -76,7 +80,7 @@ export const prepareDepositTx = async (
     const rent = await connection.getMinimumBalanceForRentExemption(AccountLayout.span)
 
     const createTokenAccountIx = SystemProgram.createAccount({
-      fromPubkey: payerPublicKey,
+      fromPubkey: feePayer,
       newAccountPubkey: SOLDepositSource,
       programId: TOKEN_PROGRAM_ID,
       space: AccountLayout.span,
@@ -86,13 +90,13 @@ export const prepareDepositTx = async (
       TOKEN_PROGRAM_ID,
       NATIVE_MINT,
       SOLDepositSource,
-      payerPublicKey,
+      feePayer,
     )
     closeTokenAccountIx = Token.createCloseAccountInstruction(
       TOKEN_PROGRAM_ID,
       SOLDepositSource,
-      payerPublicKey,
-      payerPublicKey,
+      feePayer,
+      feePayer,
       [],
     )
 
@@ -100,21 +104,24 @@ export const prepareDepositTx = async (
     source = SOLDepositSource
   }
 
-  destination = destination ?? (await findAssociatedTokenAccount(payerPublicKey, poolMint))
-  !(await connection.getAccountInfo(destination)) &&
+  destination = destination ?? (await findAssociatedTokenAccount(feePayer, poolMint))
+  const destinationInfo = await connection.getAccountInfo(destination)
+
+  if (!destinationInfo) {
     tx.add(
       new CreateAssociatedTokenAccount(
-        { feePayer: payerPublicKey },
+        { feePayer: feePayer },
         {
           associatedTokenAddress: destination,
           tokenMint: poolMint,
         },
       ),
     )
+  }
 
   tx.add(
     new DepositTx(
-      { feePayer: payerPublicKey },
+      { feePayer: feePayer },
       {
         poolConfig,
         poolMarket,
@@ -124,14 +131,14 @@ export const prepareDepositTx = async (
         tokenAccount,
         poolMint,
         rewardPool,
-        rewardAccount,
+        miningAccount,
         poolMarketAuthority,
         amount,
       },
     ),
   )
 
-  closeTokenAccountIx && tx.add(closeTokenAccountIx)
+  if (closeTokenAccountIx) tx.add(closeTokenAccountIx)
 
   return { tx, keypairs: { SOLDepositKeypair } }
 }

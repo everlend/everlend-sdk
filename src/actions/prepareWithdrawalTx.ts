@@ -24,7 +24,7 @@ import { CreateAssociatedTokenAccount } from '../common'
  * @returns the object with a prepared withdrawal transaction.
  */
 export const prepareWithdrawalTx = async (
-  { connection, payerPublicKey }: ActionOptions,
+  { connection, feePayer }: ActionOptions,
   withdrawalRequest: PublicKey,
 ): Promise<ActionResult> => {
   const {
@@ -50,7 +50,7 @@ export const prepareWithdrawalTx = async (
     unwrapAccounts = {
       tokenMint: tokenMint,
       unwrapTokenAccount: unwrapTokenAccount,
-      signer: payerPublicKey,
+      signer: feePayer,
     }
   }
 
@@ -60,7 +60,7 @@ export const prepareWithdrawalTx = async (
   !(await connection.getAccountInfo(destination)) &&
     tx.add(
       new CreateAssociatedTokenAccount(
-        { feePayer: payerPublicKey },
+        { feePayer: feePayer },
         {
           associatedTokenAddress: destination,
           tokenMint,
@@ -70,7 +70,7 @@ export const prepareWithdrawalTx = async (
 
   tx.add(
     new WithdrawalTx(
-      { feePayer: payerPublicKey },
+      { feePayer: feePayer },
       {
         poolMarket,
         pool,

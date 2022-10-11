@@ -6,7 +6,7 @@ import { Buffer } from 'buffer'
 import { CreateAssociatedTokenAccount, findAssociatedTokenAccount } from '../common'
 import { WithdrawalRequestTx } from '../transactions'
 import BN from 'bn.js'
-import { getRewardPoolAndAccount } from '../utils'
+import { getRewardPoolAndMiningAccount } from '../utils'
 
 /**
  * Creates a transaction object for a withdrawal request from a general pool.
@@ -19,6 +19,7 @@ import { getRewardPoolAndAccount } from '../utils'
  *
  * @param actionOptions
  * @param pool the general pool public key for a specific token, e.g. there can be a general pool for USDT or USDC etc.
+ * @param authority main sol address
  * @param collateralAmount the amount of collateral tokens in lamports which will be taken from a user.
  * @param source the public key which represents user's collateral token ATA (pool mint ATA) from which the collateral tokens will be taken.
  * @param destination the public key which represents user's token ATA (token mint ATA) to which the withdrawn from
@@ -28,8 +29,9 @@ import { getRewardPoolAndAccount } from '../utils'
  * @returns the object with a prepared withdrawal request transaction.
  */
 export const prepareWithdrawalRequestTx = async (
-  { connection, payerPublicKey, user, network }: ActionOptions,
+  { connection, feePayer, network }: ActionOptions,
   pool: PublicKey,
+  authority: PublicKey,
   collateralAmount: BN,
   source: PublicKey,
   destination?: PublicKey,
@@ -37,15 +39,15 @@ export const prepareWithdrawalRequestTx = async (
   const {
     data: { tokenMint, poolMarket, tokenAccount, poolMint },
   } = await Pool.load(connection, pool)
-  const { rewardPool, rewardAccount } = await getRewardPoolAndAccount(
+  const { rewardPool, miningAccount } = await getRewardPoolAndMiningAccount({
     pool,
     connection,
-    user,
+    authority,
     network,
-  )
+  })
 
   const withdrawRequests = await WithdrawalRequestsState.getPDA(poolMarket, tokenMint)
-  const withdrawalRequest = await UserWithdrawalRequest.getPDA(withdrawRequests, payerPublicKey)
+  const withdrawalRequest = await UserWithdrawalRequest.getPDA(withdrawRequests, feePayer)
 
   const collateralTransit = await GeneralPoolsProgram.findProgramAddress([
     Buffer.from('transit'),
@@ -61,11 +63,11 @@ export const prepareWithdrawalRequestTx = async (
   ])
 
   // Create destination account for token mint if doesn't exist
-  destination = destination ?? (await findAssociatedTokenAccount(payerPublicKey, tokenMint))
+  destination = destination ?? (await findAssociatedTokenAccount(feePayer, tokenMint))
   !(await connection.getAccountInfo(destination)) &&
     tx.add(
       new CreateAssociatedTokenAccount(
-        { feePayer: payerPublicKey },
+        { feePayer: feePayer },
         {
           associatedTokenAddress: destination,
           tokenMint,
@@ -75,7 +77,7 @@ export const prepareWithdrawalRequestTx = async (
 
   tx.add(
     new WithdrawalRequestTx(
-      { feePayer: payerPublicKey },
+      { feePayer: feePayer },
       {
         poolConfig,
         poolMarket,
@@ -89,7 +91,7 @@ export const prepareWithdrawalRequestTx = async (
         poolMint,
         collateralAmount,
         rewardPool,
-        rewardAccount,
+        miningAccount,
       },
     ),
   )

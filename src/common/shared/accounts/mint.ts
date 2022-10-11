@@ -4,6 +4,16 @@ import { Buffer } from 'buffer'
 import { ERROR_INVALID_OWNER, ERROR_INVALID_ACCOUNT_DATA } from '../../errors'
 import { Account } from '../../base'
 
+export interface DeserializeMintResponse {
+  decimals: number
+  freezeAuthority: null | PublicKey
+  freezeAuthorityOption: number
+  isInitialized: boolean
+  mintAuthority: PublicKey
+  mintAuthorityOption: number
+  supply: u64
+}
+
 export class Mint extends Account<MintInfo> {
   constructor(publicKey: PublicKey, info: AccountInfo<Buffer>) {
     super(publicKey, info)
@@ -16,7 +26,7 @@ export class Mint extends Account<MintInfo> {
       throw ERROR_INVALID_ACCOUNT_DATA()
     }
 
-    this.data = deserialize(this.info.data)
+    this.data = deserializeMint(this.info.data)
   }
 
   static isCompatible(data: Buffer) {
@@ -24,7 +34,7 @@ export class Mint extends Account<MintInfo> {
   }
 }
 
-export const deserialize = (data: Buffer) => {
+export const deserializeMint = (data: Buffer): DeserializeMintResponse => {
   const mintInfo = MintLayout.decode(data)
 
   if (mintInfo.mintAuthorityOption === 0) {

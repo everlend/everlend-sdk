@@ -18,7 +18,7 @@ export class WithdrawalTxData extends Borsh.Data {
   instruction = 6
 }
 
-type WithdrawalTxParams = {
+interface WithdrawalTxParams {
   poolMarket: PublicKey
   pool: PublicKey
   poolMarketAuthority: PublicKey
@@ -32,7 +32,7 @@ type WithdrawalTxParams = {
   unwrapAccounts?: UnwrapParams
 }
 
-export type UnwrapParams = {
+export interface UnwrapParams {
   tokenMint: PublicKey
   unwrapTokenAccount: PublicKey
   signer: PublicKey

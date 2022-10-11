@@ -79,7 +79,7 @@ describe('Pool', () => {
 
     test('success', async () => {
       const { tx, keypairs } = await prepareCreatePoolTx(
-        { connection, payerPublicKey },
+        { connection, feePayer: payerPublicKey },
         POOL_MARKET_PUBKEY,
         tokenMint.publicKey,
       )
@@ -105,8 +105,9 @@ describe('Pool', () => {
     test('success', async () => {
       const amount = new BN(1000)
       const { tx } = await prepareDepositTx(
-        { connection, payerPublicKey },
+        { connection, feePayer: payerPublicKey },
         POOL_PUBKEY,
+        payerPublicKey,
         amount,
         source,
         destination,
@@ -130,8 +131,9 @@ describe('Pool', () => {
     test('success', async () => {
       const amount = new BN(1000)
       const { tx } = await prepareWithdrawalRequestTx(
-        { connection, payerPublicKey },
+        { connection, feePayer: payerPublicKey },
         POOL_PUBKEY,
+        payerPublicKey,
         amount,
         destination,
         source,

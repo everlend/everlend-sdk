@@ -18,7 +18,7 @@ import { CreatePoolTx } from '../transactions'
  */
 
 export const prepareCreatePoolTx = async (
-  { connection, payerPublicKey }: ActionOptions,
+  { connection, feePayer }: ActionOptions,
   poolMarket: PublicKey,
   tokenMint: PublicKey,
   tokenAccount = Keypair.generate(),
@@ -32,7 +32,7 @@ export const prepareCreatePoolTx = async (
   const tx = new Transaction()
   tx.add(
     SystemProgram.createAccount({
-      fromPubkey: payerPublicKey,
+      fromPubkey: feePayer,
       newAccountPubkey: tokenAccount.publicKey,
       lamports: tokenAccountlamports,
       space: AccountLayout.span,
@@ -41,7 +41,7 @@ export const prepareCreatePoolTx = async (
   )
   tx.add(
     SystemProgram.createAccount({
-      fromPubkey: payerPublicKey,
+      fromPubkey: feePayer,
       newAccountPubkey: poolMint.publicKey,
       lamports: poolMintlamports,
       space: MintLayout.span,
@@ -54,7 +54,7 @@ export const prepareCreatePoolTx = async (
 
   tx.add(
     new CreatePoolTx(
-      { feePayer: payerPublicKey },
+      { feePayer: feePayer },
       {
         poolMarket,
         pool: poolPubkey,

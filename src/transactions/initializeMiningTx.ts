@@ -13,7 +13,7 @@ import { RewardProgram } from '../rewardProgram'
 type InitializeMiningTxParams = {
   rewardPool: PublicKey
   mining: PublicKey
-  user: PublicKey
+  authority: PublicKey
 }
 
 export class InitializeMiningData extends Borsh.Data<{ amount: BN }> {
@@ -26,7 +26,7 @@ export class InitializeMining extends Transaction {
   constructor(options: TransactionCtorFields, params: InitializeMiningTxParams) {
     super(options)
     const { feePayer } = options
-    const { rewardPool, mining, user } = params
+    const { rewardPool, mining, authority } = params
 
     const data = InitializeMiningData.serialize()
 
@@ -35,7 +35,7 @@ export class InitializeMining extends Transaction {
           keys: [
             { pubkey: rewardPool, isSigner: false, isWritable: true },
             { pubkey: mining, isSigner: false, isWritable: true },
-            { pubkey: user, isSigner: false, isWritable: false },
+            { pubkey: authority, isSigner: false, isWritable: false },
             { pubkey: feePayer, isSigner: true, isWritable: true },
             {
               pubkey: SystemProgram.programId,

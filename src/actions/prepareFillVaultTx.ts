@@ -7,16 +7,16 @@ import BN from 'bn.js'
  * Fill lm-rewards for picked token (ONLY DEVNET)
  * @param actionOptions
  *
- * @param rewardPool
- * @param rewardMint
+ * @param rewardPool reward pool public key
+ * @param rewardMint reward mint public key
  * @param vault
- * @param feeAccount
- * @param authority
- * @param from
- * @param amount
+ * @param feeAccount fee payer account
+ * @param authority main sol account
+ * @param from source account
+ * @param amount amount of tokens
  */
 export const prepareFillVault = async (
-  { payerPublicKey }: ActionOptions,
+  { feePayer }: ActionOptions,
   rewardPool: PublicKey,
   rewardMint: PublicKey,
   vault: PublicKey,
@@ -29,7 +29,7 @@ export const prepareFillVault = async (
 
   tx.add(
     new FillVaultTx(
-      { feePayer: payerPublicKey },
+      { feePayer: feePayer },
       {
         rewardPool,
         rewardMint,

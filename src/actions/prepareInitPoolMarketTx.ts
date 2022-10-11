@@ -12,7 +12,7 @@ import { ActionOptions, ActionResult } from '../utils'
  */
 
 export const prepareInitPoolMarketTx = async (
-  { connection, payerPublicKey }: ActionOptions,
+  { connection, feePayer }: ActionOptions,
   poolMarket = Keypair.generate(),
 ): Promise<ActionResult> => {
   const lamports = await connection.getMinimumBalanceForRentExemption(PoolMarket.LEN)
@@ -20,7 +20,7 @@ export const prepareInitPoolMarketTx = async (
   const tx = new Transaction()
   tx.add(
     SystemProgram.createAccount({
-      fromPubkey: payerPublicKey,
+      fromPubkey: feePayer,
       newAccountPubkey: poolMarket.publicKey,
       lamports,
       space: PoolMarket.LEN,
@@ -29,7 +29,7 @@ export const prepareInitPoolMarketTx = async (
   )
   tx.add(
     new InitPoolMarketTx(
-      { feePayer: payerPublicKey },
+      { feePayer: feePayer },
       {
         poolMarket: poolMarket.publicKey,
       },
