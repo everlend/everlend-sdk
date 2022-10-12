@@ -2,7 +2,7 @@ import { Token, TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import { PublicKey, Transaction, TransactionCtorFields } from '@solana/web3.js'
 import BN from 'bn.js'
 
-type MintToParams = {
+interface MintToParams {
   mint: PublicKey
   dest: PublicKey
   amount: number | BN

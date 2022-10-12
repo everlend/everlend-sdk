@@ -16,7 +16,7 @@ describe('PoolMarket', () => {
 
   describe('InitPoolMarket', () => {
     test('success', async () => {
-      const { tx, keypairs } = await prepareInitPoolMarketTx({ connection, payerPublicKey })
+      const { tx, keypairs } = await prepareInitPoolMarketTx({ connection, feePayer: payerPublicKey })
       const poolMarketKeypair = keypairs.poolMarket
 
       await sendAndConfirmTransaction(connection, tx, [payer, poolMarketKeypair], {

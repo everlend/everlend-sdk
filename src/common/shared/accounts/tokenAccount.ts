@@ -9,6 +9,22 @@ import { Buffer } from 'buffer'
 import { ERROR_INVALID_OWNER, ERROR_INVALID_ACCOUNT_DATA } from '../../errors'
 import { Account } from '../../base'
 
+export interface DeserializeTokenResponse {
+  amount: u64
+  closeAuthority: null | PublicKey
+  closeAuthorityOption: number
+  delegate: null | PublicKey
+  delegateOption: number
+  delegatedAmount: u64
+  isFrozen: boolean
+  isNative: boolean
+  isNativeOption: number
+  mint: PublicKey
+  owner: PublicKey
+  state: number
+  rentExemptReserve: null | number
+}
+
 export class TokenAccount extends Account<TokenAccountInfo> {
   constructor(publicKey: PublicKey, info: AccountInfo<Buffer>) {
     super(publicKey, info)
@@ -45,7 +61,7 @@ export const deserializeTokenAccount = (data: Buffer) => {
 
   if (accountInfo.delegateOption === 0) {
     accountInfo.delegate = null
-    accountInfo.delegatedAmount = new u64()
+    accountInfo.delegatedAmount = new u64(0)
   } else {
     accountInfo.delegate = new PublicKey(accountInfo.delegate)
     accountInfo.delegatedAmount = u64.fromBuffer(accountInfo.delegatedAmount)

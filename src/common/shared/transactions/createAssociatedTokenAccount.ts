@@ -9,7 +9,7 @@ import {
 } from '@solana/web3.js'
 import { Buffer } from 'buffer'
 
-type CreateAssociatedTokenAccountParams = {
+interface CreateAssociatedTokenAccountParams {
   associatedTokenAddress: PublicKey
   tokenMint: PublicKey
   owner?: PublicKey

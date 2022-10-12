@@ -15,7 +15,7 @@ import BN from 'bn.js'
  */
 
 export const prepareRepayTx = async (
-  { connection, payerPublicKey }: ActionOptions,
+  { connection, feePayer }: ActionOptions,
   pool: PublicKey,
   amount: BN,
   interestAmount: BN,
@@ -25,10 +25,10 @@ export const prepareRepayTx = async (
     data: { poolMarket, tokenAccount },
   } = await Pool.load(connection, pool)
 
-  const poolBorrowAuthority = await PoolBorrowAuthority.getPDA(pool, payerPublicKey)
+  const poolBorrowAuthority = await PoolBorrowAuthority.getPDA(pool, feePayer)
 
   const tx = new RepayTx(
-    { feePayer: payerPublicKey },
+    { feePayer: feePayer },
     {
       poolMarket,
       pool,

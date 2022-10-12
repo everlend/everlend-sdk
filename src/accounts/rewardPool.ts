@@ -5,14 +5,14 @@ import BN from 'bn.js'
 import { GeneralPoolsProgram } from '../program'
 import { Buffer } from 'buffer'
 
-interface IRewardVault {
+export interface IRewardVault {
   bump: BN
   rewardMint: PublicKey
   indexWithPrecision: BN
   feeAccount: PublicKey
 }
 
-type Args = {
+interface Args {
   accountType: RewardsAccountType
   rewardsRoot: PublicKey
   bump: BN

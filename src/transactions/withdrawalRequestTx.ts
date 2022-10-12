@@ -35,7 +35,7 @@ type WithdrawalRequestTxParams = {
   collateralTransit: PublicKey
   collateralAmount: BN
   rewardPool: PublicKey
-  rewardAccount: PublicKey
+  miningAccount: PublicKey
 }
 
 export class WithdrawalRequestTx extends Transaction {
@@ -55,7 +55,7 @@ export class WithdrawalRequestTx extends Transaction {
       poolMint,
       collateralAmount,
       rewardPool,
-      rewardAccount,
+      miningAccount,
     } = params
 
     const data = WithdrawalRequestTxData.serialize({ collateralAmount })
@@ -75,7 +75,7 @@ export class WithdrawalRequestTx extends Transaction {
           { pubkey: collateralTransit, isSigner: false, isWritable: true },
           { pubkey: feePayer, isSigner: true, isWritable: true },
           { pubkey: rewardPool, isSigner: false, isWritable: true },
-          { pubkey: rewardAccount, isSigner: false, isWritable: true },
+          { pubkey: miningAccount, isSigner: false, isWritable: true },
           { pubkey: RewardProgram.PUBKEY, isSigner: false, isWritable: false },
           { pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },
           { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },

@@ -5,9 +5,9 @@
 Everlend is a lending aggregator and optimizer. Get the best rates on your deposits and loans,
 always.
 
-### What's a everlend-sdk?
+### What's a general pool?
 
-A everlend-sdk is an implementation of Solana pool program, which is responsible for storing users'
+A general pool is an implementation of Solana pool program, which is responsible for storing users'
 liquidity and minting collateral tokens. There’s a general pool for every token supported by
 Everlend. When users interact with Everlend, they actually work with general pools, e.g. users'
 deposits and withdrawals are made via them.
@@ -19,6 +19,10 @@ The SDK allows interacting with Everlend general pools, specifically:
 - preparing deposit transactions to a general pool
 - preparing withdrawal request transactions from a general pool
 - preparing withdrawal transactions from a general pool
+- preparing transactions for initializing a mining account for a user to allow receiving liquidity
+  mining rewards
+- preparing transactions for claiming liquidity mining rewards
+- preparing transactions for transferring deposits
 
 It's still work in progress. In the future the SDK will be expanded with other useful features such
 as getting APYs for tokens etc.
@@ -35,53 +39,68 @@ as getting APYs for tokens etc.
 
 ## Usage
 
-### Find pools
+### Actions
 
 ```js
-import { Pool } from '@everlend/everlend-sdk'
+// Create an instance of EverlendActions class
+import { EverlendActions } from '@everlend/everlend-sdk'
 
-const pools = await Pool.findMany(connection, {
-  poolMarket,
+const everlendActions = new EverlendActions({
+  connection, //  solana web3 connection
+  network, // 'devnet' | 'mainnet'
+  feePayer, // public key
 })
 ```
 
-### Find user's withdrawal requests
+### Make deposit using actions class
 
 ```js
-import { UserWithdrawalRequest } from '@everlend/everlend-sdk'
-
-const userWithdrawalRequests = await UserWithdrawalRequest.findMany(connection, {
-  from,
-})
-```
-
-### Prepare a deposit transaction
-
-```js
-import { prepareDepositTx } from '@everlend/everlend-sdk'
-
-const depositTx = await prepareDepositTx(
-  { connection, payerPublicKey },
+const { tx: depositTx } = await everlendActions.getDepositTx(
   pool,
+  authority,
   amount,
-  rewardPool,
-  rewardAccount,
   source,
   destination,
 )
 ```
 
-### Prepare a withdrawal request transaction
+### Make withdrawal using actions class
+
+```js
+const { tx: withdrawalTx } = await everlendActions.getWithdrawalRequestTx(
+  pool,
+  authority,
+  amount,
+  source,
+  destination,
+)
+```
+
+### Prepare a withdrawal without actions class
 
 ```js
 import { prepareWithdrawalRequestTx } from '@everlend/everlend-sdk'
 
-const withdrawalRequestTx = await prepareWithdrawalRequestTx(
-  { connection, payerPublicKey },
+const { tx: withdrawalRequestTx } = await prepareWithdrawalRequestTx(
+  { connection, feePayer, network },
   pool,
-  collateralAmount,
-  rewardPool,
-  rewardAccount,
+  authority,
+  amount,
+  source,
+  destination,
+)
+```
+
+### Prepare a deposit without actions class
+
+```js
+import { prepareDepositTx } from '@everlend/everlend-sdk'
+
+const { tx: depositTx } = await prepareDepositTx(
+  { connection, feePayer, network },
+  pool,
+  authority,
+  amount,
   source,
   destination,
 )
@@ -95,7 +114,7 @@ import { prepareWithdrawalTx } from '@everlend/everlend-sdk'
 const withdrawalTx = await prepareWithdrawalTx(
   {
     connection,
-    payerPublicKey,
+    feePayer,
   },
   withdrawalRequest,
 )
@@ -106,9 +125,3 @@ const withdrawalTx = await prepareWithdrawalTx(
 **Mainnet:** DzGDoJHdzUANM7P7V25t5nxqbvzRcHDmdhY51V6WNiXC
 
 **Devnet:** 4yC3cUWXQmoyyybfnENpxo33hiNxUNa1YAmmuxz93WAJ
-
-## Registry public keys
-
-**Mainnet:** UaqUGgMvVzUZLthLHC9uuuBzgw5Ldesich94Wu5pMJg
-
-**Devnet:** 6KCHtgSGR2WDE3aqrqSJppHRGVPgy9fHDX5XD8VZgb61

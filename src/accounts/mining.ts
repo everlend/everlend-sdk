@@ -6,13 +6,13 @@ import { Buffer } from 'buffer'
 
 const PRECISION = 1_000_000_000_000_000_0
 
-type IRewardIndex = {
+interface IRewardIndex {
   rewardMint: PublicKey
   indexWithPrecision: BN
   rewards: BN
 }
 
-type Args = {
+interface Args {
   anchorId: Array<BN>
   rewardPool: PublicKey
   bump: BN
@@ -66,38 +66,6 @@ export class MiningData extends Borsh.Data<Args> {
   share: BN
   owner: PublicKey
   indexes: Array<RewardIndex>
-
-  /**
-   * Calculates user's claim amount.
-   *
-   * @param rewardMint Reward mint
-   * @param rewardPool Reward pool
-   */
-  // getUserClaimAmount(rewardMint: PublicKey, rewardPool: RewardPool) {
-  //   const share = this.share
-  //
-  //   for (const vault of rewardPool.data.vaults) {
-  //     const rewardIndex = this.indexes.find((i) => i.rewardMint == vault.rewardMint)
-  //     const rewardIndexI = this.indexes.indexOf(rewardIndex)
-  //
-  //     if (vault.indexWithPrecision.toNumber() > rewardIndex) {
-  //       const rewards =
-  //         ((vault.indexWithPrecision - rewardIndex.indexWithPrecision) * share) / PRECISION
-  //
-  //       if (rewards > 0) {
-  //         this.indexes[rewardIndexI].rewards = rewardIndex.rewards.toNumber() + rewards
-  //       }
-  //
-  //       this.indexes[rewardIndexI].indexWithPrecision = vault.indexWithPrecision
-  //     }
-  //
-  //     vault.indexWithPrecision
-  //   }
-  //
-  //   const index = this.indexes.find((i) => i.rewardMint == rewardMint)
-  //
-  //   return index.rewards
-  // }
 }
 
 export class Mining extends Account<MiningData> {

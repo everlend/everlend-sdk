@@ -17,7 +17,7 @@ import BN from 'bn.js'
  * @returns the object with a prepared tx.
  */
 export const prepareBorrowTx = async (
-  { connection, payerPublicKey }: ActionOptions,
+  { connection, feePayer }: ActionOptions,
   pool: PublicKey,
   amount: BN,
   destination?: PublicKey,
@@ -27,16 +27,16 @@ export const prepareBorrowTx = async (
   } = await Pool.load(connection, pool)
 
   const poolMarketAuthority = await GeneralPoolsProgram.findProgramAddress([poolMarket.toBuffer()])
-  const poolBorrowAuthority = await PoolBorrowAuthority.getPDA(pool, payerPublicKey)
+  const poolBorrowAuthority = await PoolBorrowAuthority.getPDA(pool, feePayer)
 
   const tx = new Transaction()
 
   // Create destination account for token mint if doesn't exist
-  destination = destination ?? (await findAssociatedTokenAccount(payerPublicKey, tokenMint))
+  destination = destination ?? (await findAssociatedTokenAccount(feePayer, tokenMint))
   !(await connection.getAccountInfo(destination)) &&
     tx.add(
       new CreateAssociatedTokenAccount(
-        { feePayer: payerPublicKey },
+        { feePayer: feePayer },
         {
           associatedTokenAddress: destination,
           tokenMint: tokenMint,
@@ -46,7 +46,7 @@ export const prepareBorrowTx = async (
 
   tx.add(
     new BorrowTx(
-      { feePayer: payerPublicKey },
+      { feePayer: feePayer },
       {
         poolMarket,
         pool,

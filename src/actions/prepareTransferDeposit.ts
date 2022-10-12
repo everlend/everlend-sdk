@@ -1,13 +1,13 @@
 import { ActionOptions, ActionResult } from '../utils'
 import { PublicKey, Transaction } from '@solana/web3.js'
 import { TransferDepositTx } from '../transactions'
-import { Pool } from '../accounts'
-import { getRewardPoolAndAccount } from '../utils'
+import { getRewardPoolAndMiningAccount } from '../utils'
 
 /**
  * Creates a transaction object for a transferring deposit to destination account.
  *
  * @param actionOptions
+ * @param authority main sol address
  * @param pool the general pool public key for a specific token, e.g. there can be a general pool for USDT or USDC etc.
  * @param source the public key which represents user's collateral token ATA (pool mint ATA) from which the collateral tokens will be taken.
  * @param destination the public key which represents user's token ATA (token mint ATA) to which the withdrawn from
@@ -17,7 +17,8 @@ import { getRewardPoolAndAccount } from '../utils'
  * @returns the object with a prepared transfer transaction.
  */
 export const prepareTransferDepositTx = async (
-  { connection, payerPublicKey, network, user }: ActionOptions,
+  { connection, feePayer, network }: ActionOptions,
+  authority: PublicKey,
   pool: PublicKey,
   source: PublicKey,
   destination: PublicKey,
@@ -25,23 +26,23 @@ export const prepareTransferDepositTx = async (
   destinationRewardAccount: PublicKey,
 ): Promise<ActionResult> => {
   const tx = new Transaction()
-  const { rewardAccount, rewardPool } = await getRewardPoolAndAccount(
+  const { miningAccount, rewardPool } = await getRewardPoolAndMiningAccount({
     pool,
     connection,
-    user,
+    authority,
     network,
-  )
+  })
 
   tx.add(
     new TransferDepositTx(
-      { feePayer: payerPublicKey },
+      { feePayer: feePayer },
       {
         pool,
         source,
         destination,
         destinationUserAuthority,
         rewardPool,
-        rewardAccount,
+        miningAccount,
         destinationRewardAccount,
       },
     ),
