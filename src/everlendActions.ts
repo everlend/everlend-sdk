@@ -17,6 +17,7 @@ import {
 } from './actions'
 import { Pool } from './accounts'
 import { getUserCompoundBalancesByPools } from './actions'
+import { prepareClaimTx } from './actions/prepareClaimTx'
 
 type EverlendActionsParams = {
   network: NetworkType
@@ -108,6 +109,20 @@ export class EverlendActions {
   ): Promise<ActionResult> {
     const { connection, feePayer } = this
     return await prepareInititalizeMining({ connection, feePayer }, authority, rewardPool, mining)
+  }
+
+  async getClaimTx(
+    rewardPool: PublicKey,
+    rewardMint: PublicKey,
+    userRewardTokenAccount: PublicKey,
+  ): Promise<ActionResult> {
+    const { feePayer, connection } = this
+    return await prepareClaimTx(
+      { connection, feePayer },
+      rewardPool,
+      rewardMint,
+      userRewardTokenAccount,
+    )
   }
 
   static calcETokenRate = calcETokenRate
