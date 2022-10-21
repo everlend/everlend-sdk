@@ -1,6 +1,6 @@
 {
   "name": "@everlend/sdk",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "MIT",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
@@ -19,9 +19,9 @@
     "test:watch": "jest --watch"
   },
   "devDependencies": {
+    "@types/bn.js": "^5.1.1",
     "@types/jest": "^27.0.2",
     "@types/node": "^16.11.1",
-    "@types/bn.js": "^5.1.1",
     "jest": "^27.3.0",
     "rimraf": "^3.0.2",
     "ts-jest": "^27.0.7",
@@ -40,6 +40,7 @@
     "borsh": "^0.6.0",
     "bs58": "^4.0.1",
     "buffer": "^6.0.3",
-    "prettier": "^2.7.1"
+    "prettier": "^2.7.1",
+    "typedoc": "^0.23.18"
   }
 }

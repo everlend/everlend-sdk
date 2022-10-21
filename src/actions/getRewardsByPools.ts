@@ -85,6 +85,9 @@ export const getRewardsByPool = async (
 
           return {
             pool: pool.toString(),
+            rewardPool: rewardPoolPubKey.toString(),
+            miningAccount: miningAccountPubKey.toString(),
+            miningAccountShare: miningAccount.data.share.toNumber(),
             poolRewards,
           }
         } catch (e) {
