@@ -31,11 +31,11 @@ as getting APYs for tokens etc.
 
 ### Yarn
 
-`$ yarn add @everlend/everlend-sdk`
+`$ yarn add @everlend/sdk`
 
 ### NPM
 
-`npm install @everlend/everlend-sdk`
+`npm install @everlend/sdk`
 
 ## Usage
 
@@ -43,7 +43,7 @@ as getting APYs for tokens etc.
 
 ```js
 // Create an instance of EverlendActions class
-import { EverlendActions } from '@everlend/everlend-sdk'
+import { EverlendActions } from '@everlend/sdk'
 
 const everlendActions = new EverlendActions({
   connection, //  solana web3 connection
@@ -79,7 +79,7 @@ const { tx: withdrawalTx } = await everlendActions.getWithdrawalRequestTx(
 ### Prepare a withdrawal without actions class
 
 ```js
-import { prepareWithdrawalRequestTx } from '@everlend/everlend-sdk'
+import { prepareWithdrawalRequestTx } from '@everlend/sdk'
 
 const { tx: withdrawalRequestTx } = await prepareWithdrawalRequestTx(
   { connection, feePayer, network },
@@ -94,7 +94,7 @@ const { tx: withdrawalRequestTx } = await prepareWithdrawalRequestTx(
 ### Prepare a deposit without actions class
 
 ```js
-import { prepareDepositTx } from '@everlend/everlend-sdk'
+import { prepareDepositTx } from '@everlend/sdk'
 
 const { tx: depositTx } = await prepareDepositTx(
   { connection, feePayer, network },
@@ -109,7 +109,7 @@ const { tx: depositTx } = await prepareDepositTx(
 ### Prepare a withdrawal transaction
 
 ```js
-import { prepareWithdrawalTx } from '@everlend/everlend-sdk'
+import { prepareWithdrawalTx } from '@everlend/sdk'
 
 const withdrawalTx = await prepareWithdrawalTx(
   {
