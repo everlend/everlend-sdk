@@ -1,5 +1,7 @@
 # everlend-sdk package
 
+### [TypeScript Docs](https://sdk-docs.everlend.finance/)
+
 ### What's Everlend?
 
 Everlend is a lending aggregator and optimizer. Get the best rates on your deposits and loans,
@@ -125,5 +127,3 @@ const withdrawalTx = await prepareWithdrawalTx(
 **Mainnet:** DzGDoJHdzUANM7P7V25t5nxqbvzRcHDmdhY51V6WNiXC
 
 **Devnet:** 4yC3cUWXQmoyyybfnENpxo33hiNxUNa1YAmmuxz93WAJ
-
-[@everlend/sdk typedocs](https://everlend.vercel.app/)
