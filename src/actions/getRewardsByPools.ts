@@ -38,12 +38,14 @@ export const getRewardsByPool = async (
       rewardPoolsAndAccounts.map((obj) => obj.miningAccount),
     )
 
-    return await Promise.all(
+    const rewards = await Promise.all(
       pools.map(async (pool, index) => {
         const { miningAccount: miningAccountPubKey, rewardPool: rewardPoolPubKey } =
           rewardPoolsAndAccounts[index]
         const rewardPoolInfo = rewardPoolsInfo[index]
         const miningAccountInfo = miningAccountsInfo[index]
+
+        if (!rewardPoolInfo || !miningAccountInfo) return null
         const rewardPool = new RewardPool(rewardPoolPubKey, rewardPoolInfo)
         const miningAccount = new Mining(miningAccountPubKey, miningAccountInfo)
         const poolRewards = [] as IRewardToken[]
@@ -95,6 +97,8 @@ export const getRewardsByPool = async (
         }
       }),
     )
+
+    return rewards.filter(Boolean)
   } catch (e) {
     console.error(e)
   }
